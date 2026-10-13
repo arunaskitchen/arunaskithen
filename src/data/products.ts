@@ -67,7 +67,7 @@ export const products: Product[] = [
   make(4, 'Karam Chutallu', 349, 'Snacks', 'karam-chutallu', 'jpeg'),
   make(5, 'Karapusa', 389, 'Snacks', 'karapusa', 'jpeg'),
   make(6, 'Karam Gavallu', 349, 'Snacks', 'karam-gavallu', 'jpeg'),
-  make(7, 'Majjigamirchi', 499, 'Snacks', 'majjigamirchi', 'jpeg'),
+  make(7, 'Majjigamirchi', 399, 'Snacks', 'majjigamirchi', 'jpeg'),
   make(8, 'Vaddiyallu', 349, 'Snacks', 'vaddiyallu', 'jpeg'),
   make(
     33,
@@ -83,14 +83,14 @@ export const products: Product[] = [
   // SWEETS
   // =========================
   make(9, 'Sweet Gavallu', 349, 'Sweets', 'sweet-gavallu', 'jpeg'),
-  make(10, 'Atharasallu', 449, 'Sweets', 'atharasallu', 'jpeg'),
+  make(10, 'Atharasallu', 399, 'Sweets', 'atharasallu', 'jpeg'),
   make(11, 'Nuvulla Laddu', 689, 'Sweets', 'nuvulla-laddu', 'jpeg'),
-  make(12, 'Ravva Laddu', 449, 'Sweets', 'ravva-laddu', 'png'),
+  make(12, 'Ravva Laddu', 349, 'Sweets', 'ravva-laddu', 'png'),
   make(13, 'Millet Laddu', 899, 'Sweets', 'millet-laddu', 'jpeg'),
-  make(14, 'Ragi Laddu', 659, 'Sweets', 'ragi-laddu', 'jpeg'),
+  make(14, 'Ragi Laddu', 549, 'Sweets', 'ragi-laddu', 'jpeg'),
   make(15, 'Bumdi Laddu', 349, 'Sweets', 'bumdi-laddu', 'jpeg'),
-  make(16, 'Sunundallu', 649, 'Sweets', 'sunundallu', 'jpeg'),
-  make(17, 'Dry Fruit Laddu', 899, 'Sweets', 'dry-fruit-laddu', 'jpeg'),
+  make(16, 'Sunundallu', 549, 'Sweets', 'sunundallu', 'jpeg'),
+  make(17, 'Dry Fruit Laddu', 849, 'Sweets', 'dry-fruit-laddu', 'jpeg'),
   make(18, 'Flax Seed Laddu', 699, 'Sweets', 'flax-seed-laddu', 'png'),
 
   // =========================
