@@ -7,6 +7,8 @@ export type ProductCategory =
   | 'Farm Products'
   | 'Packages';
 
+export type ProductWeight = '250g' | '500g' | '1kg';
+
 export interface Product {
   id: number;
   name: string;

@@ -11,9 +11,10 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import type { Product, PackageOffer } from '@/types/product';
+import type { Product, PackageOffer, ProductWeight } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { formatCurrency } from '@/lib/utils';
+import { getProductPriceForWeight } from '@/data/products';
 import QuantitySelector from './QuantitySelector';
 
 export default function ProductDetails({
@@ -23,12 +24,18 @@ export default function ProductDetails({
 }) {
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState<string>(product.image);
+  const [selectedWeight, setSelectedWeight] = useState<ProductWeight>('1kg');
 
   const isPackage =
     product.category === 'Packages' ||
     product.unit === 'Combo Pack' ||
     'packageItems' in (product as unknown as Record<string, unknown>);
   const packageOffer = isPackage ? (product as PackageOffer) : null;
+
+  const currentPrice = isPackage
+    ? product.price
+    : getProductPriceForWeight(product.price, selectedWeight);
+  const currentUnit = isPackage ? (product.unit || 'Combo Pack') : selectedWeight;
 
   const {
     addToCart,
@@ -39,11 +46,13 @@ export default function ProductDetails({
   } = useCart();
 
   /*
-   * Find this product inside the global cart.
+   * Find this product variant inside the global cart.
    * Keeps product detail page synchronized with home and cart.
    */
   const cartItem = items.find(
-    (item) => item.productId === product.id
+    (item) =>
+      item.productId === product.id &&
+      (isPackage ? true : item.unit === selectedWeight)
   );
 
   const isInCart = Boolean(cartItem && cartItem.quantity > 0);
@@ -52,7 +61,7 @@ export default function ProductDetails({
    * ADD TO CART
    */
   const handleAddToCart = (e?: React.MouseEvent<HTMLButtonElement>) => {
-    addToCart(product, 1, e?.currentTarget);
+    addToCart(product, 1, e?.currentTarget, currentUnit, currentPrice);
     setAdded(true);
     window.setTimeout(() => {
       setAdded(false);
@@ -64,7 +73,7 @@ export default function ProductDetails({
    */
   const handleIncrease = (e?: React.MouseEvent<HTMLButtonElement>) => {
     if (!cartItem) return;
-    increaseQuantity(product.id, e?.currentTarget);
+    increaseQuantity(product.id, currentUnit, e?.currentTarget);
   };
 
   /*
@@ -76,11 +85,11 @@ export default function ProductDetails({
     if (!cartItem) return;
 
     if (cartItem.quantity <= 1) {
-      removeFromCart(product.id);
+      removeFromCart(product.id, currentUnit);
       return;
     }
 
-    decreaseQuantity(product.id);
+    decreaseQuantity(product.id, currentUnit);
   };
 
   const savings =
@@ -176,15 +185,46 @@ export default function ProductDetails({
               </div>
             )}
 
-            <div className="price-line detail-price-line">
-              <span className="detail-price">
-                {formatCurrency(product.price)}
-                <span> / {product.unit || '1 kg'}</span>
-              </span>
-              {packageOffer && packageOffer.originalPrice > packageOffer.price && (
-                <del className="package-struck-price">
-                  {formatCurrency(packageOffer.originalPrice)}
-                </del>
+            <div className="product-price-row detail-price-row">
+              <div className="price-line detail-price-line">
+                <span className="detail-price">
+                  {formatCurrency(currentPrice)}
+                  <span> / {isPackage ? (product.unit || 'Combo Pack') : (selectedWeight === '1kg' ? '1 kg' : selectedWeight)}</span>
+                </span>
+                {packageOffer && packageOffer.originalPrice > packageOffer.price && (
+                  <del className="package-struck-price">
+                    {formatCurrency(packageOffer.originalPrice)}
+                  </del>
+                )}
+              </div>
+
+              {!isPackage && (
+                <div className="weight-selector detail-weight-selector" role="group" aria-label="Select quantity/weight">
+                  <button
+                    type="button"
+                    className={`weight-btn ${selectedWeight === '250g' ? 'active' : ''}`}
+                    onClick={() => setSelectedWeight('250g')}
+                    aria-pressed={selectedWeight === '250g'}
+                  >
+                    250g
+                  </button>
+                  <button
+                    type="button"
+                    className={`weight-btn ${selectedWeight === '500g' ? 'active' : ''}`}
+                    onClick={() => setSelectedWeight('500g')}
+                    aria-pressed={selectedWeight === '500g'}
+                  >
+                    500g
+                  </button>
+                  <button
+                    type="button"
+                    className={`weight-btn ${selectedWeight === '1kg' ? 'active' : ''}`}
+                    onClick={() => setSelectedWeight('1kg')}
+                    aria-pressed={selectedWeight === '1kg'}
+                  >
+                    1kg
+                  </button>
+                </div>
               )}
             </div>
 
@@ -213,7 +253,7 @@ export default function ProductDetails({
             <div className="detail-note">
               {product.unit === 'Combo Pack'
                 ? 'Special handcrafted value combo pack containing 3 authentic delicacies prepared fresh.'
-                : 'All listed prices are for 1 kg freshly prepared.'}
+                : 'All listed delicacies are freshly prepared using traditional Rayalaseema recipes.'}
             </div>
 
             {/* =================================
@@ -231,7 +271,7 @@ export default function ProductDetails({
                   Total:{' '}
                   <strong>
                     {formatCurrency(
-                      product.price * (cartItem?.quantity ?? 1)
+                      currentPrice * (cartItem?.quantity ?? 1)
                     )}
                   </strong>
                 </span>
@@ -239,9 +279,9 @@ export default function ProductDetails({
             ) : (
               <div className="detail-row">
                 <span className="detail-total">
-                  Price per {product.unit === 'Combo Pack' ? 'pack' : 'kg'}:{' '}
+                  Price per {isPackage ? 'pack' : selectedWeight}:{' '}
                   <strong>
-                    {formatCurrency(product.price)}
+                    {formatCurrency(currentPrice)}
                   </strong>
                 </span>
               </div>

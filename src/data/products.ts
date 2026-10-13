@@ -1,4 +1,18 @@
-import type { Product } from '@/types/product';
+import type { Product, ProductWeight } from '@/types/product';
+
+/**
+ * Calculates the price for a given weight based on the 1 kg base price.
+ * 250 g is 25% of the base price, 500 g is 50%, and 1 kg is 100%.
+ */
+export function getProductPriceForWeight(basePrice: number, weight: ProductWeight): number {
+  if (weight === '250g') {
+    return Math.round(basePrice * 0.25);
+  }
+  if (weight === '500g') {
+    return Math.round(basePrice * 0.5);
+  }
+  return basePrice;
+}
 
 const descriptions: Record<string, string> = {
   Snacks:
@@ -108,6 +122,15 @@ export const products: Product[] = [
   // FARM PRODUCTS
   // =========================
   make(32, 'Our Own Farm Palli', 149, 'Farm Products', 'farm-palli', 'png'),
+  make(
+    34,
+    'Pure Homemade Ghee',
+    1699,
+    'Farm Products',
+    'pure-homemade-ghee',
+    'jpg',
+    'Pure homemade traditional ghee prepared using authentic curd-churning methods for rich aroma, golden grainy texture, and wholesome purity.'
+  ),
 ];
 
 import { packages } from './packages';

@@ -2706,5 +2706,118 @@ html {
   }
 }
 
+/* =========================================
+   PRODUCT WEIGHT SELECTOR & PRICE ROW
+   ========================================= */
+
+.product-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  row-gap: 8px;
+  margin: 6px 0 14px;
+}
+
+.product-price-row .price-line {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.weight-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.weight-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 13px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 9999px;
+  background: #ffffff;
+  color: #2a1610;
+  border: 1.5px solid #2a1610;
+  box-shadow: 2px 2px 0px #2a1610;
+  cursor: pointer;
+  line-height: 1.25;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease, color 0.15s ease;
+  user-select: none;
+}
+
+.weight-btn:hover {
+  background: #fdf6ec;
+}
+
+.weight-btn.active {
+  background: #b33a1e;
+  color: #ffffff;
+  border-color: #2a1610;
+  box-shadow: 2px 2px 0px #2a1610;
+}
+
+.weight-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #2a1610;
+}
+
+/* Detail page styling */
+.detail-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 10px 0 20px;
+}
+
+.detail-price-row .price-line {
+  margin: 0;
+}
+
+.detail-weight-selector .weight-btn {
+  padding: 7px 18px;
+  font-size: 14px;
+  box-shadow: 2.5px 2.5px 0px #2a1610;
+}
+
+/* Responsive adjustments */
+@media (max-width: 760px) {
+  .product-price-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 11px;
+  }
+
+  .weight-selector {
+    gap: 6px;
+    width: 100%;
+  }
+
+  .weight-btn {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 12px;
+    box-shadow: 1.5px 1.5px 0px #2a1610;
+  }
+}
+
+@media (max-width: 360px) {
+  .weight-btn {
+    padding: 5px 6px;
+    font-size: 11px;
+  }
+}
+
 
 

@@ -9,7 +9,7 @@ import QuantitySelector from '../products/QuantitySelector';
 
 export default function CartItem({ item }: { item: CartItemType }) {
   const { increaseQuantity, decreaseQuantity, removeFromCart } = useCart();
-  const unitLabel = item.unit && item.unit !== '1 kg' ? item.unit : 'kg';
+  const unitLabel = item.unit === 'Combo Pack' ? 'pack' : (item.unit || '1 kg');
   return (
     <article className="cart-item">
       <div className="cart-item-image">
@@ -22,7 +22,7 @@ export default function CartItem({ item }: { item: CartItemType }) {
         </div>
         <button
           className="remove-button"
-          onClick={() => removeFromCart(item.productId)}
+          onClick={() => removeFromCart(item.productId, item.unit)}
           aria-label={`Remove ${item.name}`}
         >
           <Trash2 size={17} />
@@ -30,8 +30,8 @@ export default function CartItem({ item }: { item: CartItemType }) {
         <div className="cart-item-bottom">
           <QuantitySelector
             quantity={item.quantity}
-            onDecrease={() => decreaseQuantity(item.productId)}
-            onIncrease={(e) => increaseQuantity(item.productId, e?.currentTarget)}
+            onDecrease={() => decreaseQuantity(item.productId, item.unit)}
+            onIncrease={(e) => increaseQuantity(item.productId, item.unit, e?.currentTarget)}
           />
           <strong>{formatCurrency(item.price * item.quantity)}</strong>
         </div>

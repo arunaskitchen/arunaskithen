@@ -83,10 +83,11 @@ export default function OrderSummary({
             packages.find((pkg) => pkg.id === item.productId)?.image ||
             '/images/logo/arunas-logo.png';
 
-          const unitStr = item.unit && item.unit !== '1 kg' ? 'pack' : 'kg';
+          const unitLabel = item.unit === 'Combo Pack' ? 'pack' : (item.unit || '1 kg');
+          const itemTitle = item.unit && item.unit !== 'Combo Pack' ? `${item.name} (${item.unit})` : item.name;
 
           return (
-            <div className="review-item" key={item.productId}>
+            <div className="review-item" key={`${item.productId}-${item.unit}`}>
               <div className="review-item-left">
                 <div className="review-item-image">
                   <Image
@@ -98,9 +99,9 @@ export default function OrderSummary({
                   />
                 </div>
                 <div className="review-item-info">
-                  <span className="review-item-name">{item.name}</span>
+                  <span className="review-item-name">{itemTitle}</span>
                   <small className="review-item-qty">
-                    {item.quantity} {unitStr} × {formatCurrency(item.price)}
+                    {item.quantity} × {formatCurrency(item.price)} ({unitLabel})
                   </small>
                 </div>
               </div>

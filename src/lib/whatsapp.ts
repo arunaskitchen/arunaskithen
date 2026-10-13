@@ -20,8 +20,9 @@ export function generateWhatsAppMessage(items: CartItem[], customer: CustomerDet
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const orderLines = items
     .map((item, index) => {
-      const unitStr = item.unit && item.unit !== '1 kg' ? 'pack' : 'kg';
-      return `${index + 1}. ${item.name}\n   Quantity: ${item.quantity} ${unitStr}\n   Price: ${formatCurrency(item.price)}/${unitStr}\n   Total: ${formatCurrency(item.price * item.quantity)}`;
+      const unitLabel = item.unit === 'Combo Pack' ? 'pack' : (item.unit || '1 kg');
+      const itemTitle = item.unit && item.unit !== 'Combo Pack' ? `${item.name} (${item.unit})` : item.name;
+      return `${index + 1}. ${itemTitle}\n   Quantity: ${item.quantity}\n   Price: ${formatCurrency(item.price)}/${unitLabel}\n   Total: ${formatCurrency(item.price * item.quantity)}`;
     })
     .join('\n\n');
 

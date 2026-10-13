@@ -5,9 +5,10 @@ import Link from 'next/link';
 import { ShoppingBag, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 
-import type { Product } from '@/types/product';
+import type { Product, ProductWeight } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { formatCurrency } from '@/lib/utils';
+import { getProductPriceForWeight } from '@/data/products';
 import QuantitySelector from './QuantitySelector';
 
 export default function ProductCard({
@@ -16,6 +17,7 @@ export default function ProductCard({
   product: Product;
 }) {
   const [added, setAdded] = useState(false);
+  const [selectedWeight, setSelectedWeight] = useState<ProductWeight>('1kg');
 
   const {
     addToCart,
@@ -25,19 +27,21 @@ export default function ProductCard({
     items,
   } = useCart();
 
-  // Find the product in the cart
+  const currentPrice = getProductPriceForWeight(product.price, selectedWeight);
+
+  // Find the product variant in the cart
   const cartItem = items.find(
-    (item) => item.productId === product.id
+    (item) => item.productId === product.id && item.unit === selectedWeight
   );
 
   const isInCart = Boolean(cartItem && cartItem.quantity > 0);
 
   /*
    * ADD TO CART
-   * Adds 1 kg to cart on initial click.
+   * Adds selected weight variant to cart on click.
    */
   const handleAddToCart = (e?: React.MouseEvent<HTMLButtonElement>) => {
-    addToCart(product, 1, e?.currentTarget);
+    addToCart(product, 1, e?.currentTarget, selectedWeight, currentPrice);
     setAdded(true);
     window.setTimeout(() => {
       setAdded(false);
@@ -49,7 +53,7 @@ export default function ProductCard({
    */
   const handleIncrease = (e?: React.MouseEvent<HTMLButtonElement>) => {
     if (!cartItem) return;
-    increaseQuantity(product.id, e?.currentTarget);
+    increaseQuantity(product.id, selectedWeight, e?.currentTarget);
   };
 
   /*
@@ -61,11 +65,11 @@ export default function ProductCard({
     if (!cartItem) return;
 
     if (cartItem.quantity <= 1) {
-      removeFromCart(product.id);
+      removeFromCart(product.id, selectedWeight);
       return;
     }
 
-    decreaseQuantity(product.id);
+    decreaseQuantity(product.id, selectedWeight);
   };
 
   return (
@@ -99,12 +103,41 @@ export default function ProductCard({
           {product.name}
         </Link>
 
-        {/* Price */}
-        <div className="price-line">
-          <strong>
-            {formatCurrency(product.price)}
-          </strong>
-          <span>/ 1 kg</span>
+        {/* Price & Weight Selector Row */}
+        <div className="product-price-row">
+          <div className="price-line">
+            <strong>
+              {formatCurrency(currentPrice)}
+            </strong>
+            <span>/ {selectedWeight === '1kg' ? '1 kg' : selectedWeight}</span>
+          </div>
+
+          <div className="weight-selector" role="group" aria-label="Select quantity/weight">
+            <button
+              type="button"
+              className={`weight-btn ${selectedWeight === '250g' ? 'active' : ''}`}
+              onClick={() => setSelectedWeight('250g')}
+              aria-pressed={selectedWeight === '250g'}
+            >
+              250g
+            </button>
+            <button
+              type="button"
+              className={`weight-btn ${selectedWeight === '500g' ? 'active' : ''}`}
+              onClick={() => setSelectedWeight('500g')}
+              aria-pressed={selectedWeight === '500g'}
+            >
+              500g
+            </button>
+            <button
+              type="button"
+              className={`weight-btn ${selectedWeight === '1kg' ? 'active' : ''}`}
+              onClick={() => setSelectedWeight('1kg')}
+              aria-pressed={selectedWeight === '1kg'}
+            >
+              1kg
+            </button>
+          </div>
         </div>
 
         {/* =========================================

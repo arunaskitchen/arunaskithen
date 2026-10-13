@@ -24,14 +24,17 @@ interface CartContextValue {
   addToCart: (
     product: Product,
     quantity?: number,
-    source?: HTMLElement | React.MouseEvent | TouchEvent | null
+    source?: HTMLElement | React.MouseEvent | TouchEvent | null,
+    unit?: string,
+    price?: number
   ) => void;
-  removeFromCart: (productId: number) => void;
+  removeFromCart: (productId: number, unit?: string) => void;
   increaseQuantity: (
     productId: number,
-    source?: HTMLElement | React.MouseEvent | TouchEvent | null
+    unitOrSource?: string | HTMLElement | React.MouseEvent | TouchEvent | null,
+    maybeSource?: HTMLElement | React.MouseEvent | TouchEvent | null
   ) => void;
-  decreaseQuantity: (productId: number) => void;
+  decreaseQuantity: (productId: number, unit?: string) => void;
   clearCart: () => void;
   getCartTotal: () => number;
   getCartItemCount: () => number;
@@ -70,12 +73,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       items,
       cartToast,
       closeCartToast,
-      addToCart: (product, quantity = 1, source = null) => {
+      addToCart: (product, quantity = 1, source = null, unit, customPrice) => {
+        const finalUnit = unit || product.unit || '1 kg';
+        const finalPrice = customPrice !== undefined ? customPrice : product.price;
+
         setItems((current) => {
-          const existing = current.find((item) => item.productId === product.id);
+          const existing = current.find(
+            (item) => item.productId === product.id && item.unit === finalUnit
+          );
           if (existing) {
             return current.map((item) =>
-              item.productId === product.id
+              item.productId === product.id && item.unit === finalUnit
                 ? { ...item, quantity: item.quantity + quantity }
                 : item
             );
@@ -85,8 +93,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             {
               productId: product.id,
               name: product.name,
-              price: product.price,
-              unit: product.unit,
+              price: finalPrice,
+              unit: finalUnit,
               quantity,
               image: product.image,
             },
@@ -95,8 +103,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
         // Trigger message notification
         setCartToast({
-          id: `${product.id}-${Date.now()}`,
-          product,
+          id: `${product.id}-${finalUnit}-${Date.now()}`,
+          product: {
+            ...product,
+            price: finalPrice,
+            unit: finalUnit,
+          },
           quantity,
           actionType: 'added',
         });
@@ -104,14 +116,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         // Trigger moving animation to cart icon (desktop top nav or mobile bottom nav)
         triggerFlyToCartAnimation(product.image, source);
       },
-      removeFromCart: (productId) =>
-        setItems((current) => current.filter((item) => item.productId !== productId)),
-      increaseQuantity: (productId, source = null) => {
+      removeFromCart: (productId, unit) =>
+        setItems((current) =>
+          current.filter(
+            (item) =>
+              !(item.productId === productId && (unit ? item.unit === unit : true))
+          )
+        ),
+      increaseQuantity: (productId, unitOrSource = null, maybeSource = null) => {
+        const unit = typeof unitOrSource === 'string' ? unitOrSource : undefined;
+        const source = typeof unitOrSource === 'string' ? maybeSource : unitOrSource;
+
         let updatedItem: CartItem | undefined;
 
         setItems((current) =>
           current.map((item) => {
-            if (item.productId === productId) {
+            if (item.productId === productId && (unit ? item.unit === unit : true)) {
               const updated = { ...item, quantity: item.quantity + 1 };
               updatedItem = updated;
               return updated;
@@ -122,13 +142,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
         // Notify customer that quantity has been increased
         const itemToNotify =
-          updatedItem || items.find((item) => item.productId === productId);
+          updatedItem ||
+          items.find(
+            (item) =>
+              item.productId === productId && (unit ? item.unit === unit : true)
+          );
         if (itemToNotify) {
           const nextQty = updatedItem
             ? updatedItem.quantity
             : itemToNotify.quantity + 1;
           setCartToast({
-            id: `${productId}-${Date.now()}`,
+            id: `${productId}-${itemToNotify.unit}-${Date.now()}`,
             product: {
               id: itemToNotify.productId,
               name: itemToNotify.name,
@@ -144,10 +168,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           triggerFlyToCartAnimation(itemToNotify.image, source);
         }
       },
-      decreaseQuantity: (productId) =>
+      decreaseQuantity: (productId, unit) =>
         setItems((current) =>
           current.map((item) =>
-            item.productId === productId
+            item.productId === productId && (unit ? item.unit === unit : true)
               ? { ...item, quantity: Math.max(1, item.quantity - 1) }
               : item
           )
